@@ -1,7 +1,6 @@
 #ifndef JDEVTOOLS_JDEVSTRING_HPP
 #define JDEVTOOLS_JDEVSTRING_HPP
 
-#include "jdevtools/sha256hmac.hpp"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -21,7 +20,7 @@ namespace jdevtools {
 	inline std::string base64urlEncode(const std::string &input);
 	inline std::string base64urlDecode(const std::string &input);
 
-	inline std::string createJWT(const char *payload, const char *secret,
+	inline std::string createJWT(const char *secret, const char *payload,
 	const char *header, std::string (&hmac_sha)(const char *, const char *));
 	inline std::string createJWT(const std::string &secret, const std::string &payload,
 	const std::string &header, std::string (&hmac_sha2)(const std::string &, const std::string &));
@@ -116,7 +115,7 @@ namespace jdevtools {
 	//     std::unordered_map<std::std::string, jsonode> raw;
 	// };
 
-	std::string createJWT(const char *payload, const char *secret, const char *header,
+	std::string createJWT(const char *secret, const char *payload, const char *header,
 	std::string (&hmac_sha)(const char *, const char *)) {
 		std::string encodedHeader = base64urlEncode(header);
 		std::string encodedPayload = base64urlEncode(payload);
@@ -126,18 +125,21 @@ namespace jdevtools {
 	}
 
 	std::string createJWT(const std::string &secret, const std::string &payload,
-	const std::string &header, std::string (&hmac_sha2)(const std::string &, const std::string &)) {
+	const std::string &header, std::string (&signature_encode)(const std::string &, const std::string &)) {
 		std::string encodedHeader = base64urlEncode(header);
 		std::string encodedPayload = base64urlEncode(payload);
 		std::string message = encodedHeader + "." + encodedPayload;
-		std::string encodedSignature = hmac_sha2(secret, message);
+		std::string encodedSignature = signature_encode(secret, message);
 		return message + "." + encodedSignature;
 	}
 
+	#ifdef JDEVTOOLS_SHA256HMAC_HPP
+	#include "jdevtools/sha256hmac.hpp"
 	std::string createJWT(const std::string &secret, const std::string &payload) {
 		std::string header = R"({"alg":"HS256","typ":"JWT"})";
 		return createJWT(secret.data(), payload.data(), header.data(), jdevtools::hmac_sha256);
 	}
+	#endif
 }
 
 #endif

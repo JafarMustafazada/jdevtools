@@ -53,6 +53,11 @@ namespace jdevtools {
 		// std::cout << command << '\n';
 		return exec(command.data());
 	}
+
+	inline std::string sender(const char* cmd) {
+		std::string command = "curl -s -o - " + std::string(cmd);
+		return exec(command.data());
+	}
 }
 
 #endif
