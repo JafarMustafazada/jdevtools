@@ -1,0 +1,5 @@
+#include "jdevtools/jdevcurl.hpp"
+#include "jdevtools/jdevrandom.hpp"
+#include "jdevtools/sha256hmac.hpp"
+#include "jdevtools/sha512hmac.hpp"
+#include "jdevtools/jdevstring.hpp"
