@@ -20,11 +20,13 @@ namespace jdevtools {
 	inline std::string base64urlEncode(const std::string &input);
 	inline std::string base64urlDecode(const std::string &input);
 
+	// `hmac_sha` can be any hashing function that takes 2 str `secret` & `msg` and returns str `signature`
 	inline std::string createJWT(const char *secret, const char *payload,
 	const char *header, std::string (&hmac_sha)(const char *, const char *));
+
+	// `hmac_sha2` can be any hashing function that takes 2 str `secret` & `msg` and returns str `signature`
 	inline std::string createJWT(const std::string &secret, const std::string &payload,
 	const std::string &header, std::string (&hmac_sha2)(const std::string &, const std::string &));
-	inline std::string createJWT(const std::string &secret, const std::string &payload);
 
 
 	std::string strTokenize(const std::string &str, const char *delim, size_t &prev) {
@@ -105,16 +107,6 @@ namespace jdevtools {
 		return decoded;
 	}
 
-	// class jdevjson {
-	// public:
-	//     class jsonode {
-	//         bool isarray = false;
-	//         bool isnumber = false;
-	//     };
-	// private:
-	//     std::unordered_map<std::std::string, jsonode> raw;
-	// };
-
 	std::string createJWT(const char *secret, const char *payload, const char *header,
 	std::string (&hmac_sha)(const char *, const char *)) {
 		std::string encodedHeader = base64urlEncode(header);
@@ -135,6 +127,7 @@ namespace jdevtools {
 
 	#ifdef JDEVTOOLS_SHA256HMAC_HPP
 	#include "jdevtools/sha256hmac.hpp"
+	// default jwt with `"alg":"HS256","typ":"JWT"` header
 	std::string createJWT(const std::string &secret, const std::string &payload) {
 		std::string header = R"({"alg":"HS256","typ":"JWT"})";
 		return createJWT(secret.data(), payload.data(), header.data(), jdevtools::hmac_sha256);

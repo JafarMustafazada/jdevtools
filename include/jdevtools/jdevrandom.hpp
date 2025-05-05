@@ -4,16 +4,28 @@
 #include <random>
 #include <string.h>
 #include <vector>
+#include <thread>
 
 namespace jdevtools {
+	// + each call generates next random number
+	// + each time seed is set it will reset random generator
+	// static variables of this function is thread safe bc of `thread_local`
 	inline int rando(int end, int start = 1, unsigned seed = 0);
+
+	// return value is index of array. Each value of array `probs` indicates frequency of index
+	// + each call generates next random index
+	// + each time seed is set it will reset random generator
 	inline int randi(const int probs[], int size, unsigned seed = 0);
+
+	// return value is index of array `probs` where each value of array indicates frequency of index
+	// + each call generates next random index
+	// + each time seed is set it will reset random generator
 	inline int randi(const std::vector<int> &probs, unsigned seed = 0);
 
 
 	int rando(int end, int start, unsigned seed) {
-		static std::random_device rd;
-		static std::mt19937 gen(rd());
+		static thread_local std::random_device rd;
+		static thread_local std::mt19937 gen(rd());
 		if (seed) gen = std::mt19937(seed);
 		std::uniform_int_distribution<> dis(start, end);
 		return dis(gen);
@@ -33,8 +45,6 @@ namespace jdevtools {
 
 		temp = rando(temp, 1, seed);
 
-		// auto it = std::upper_bound(prefixSum.begin(), prefixSum.end(), temp);
-		// return std::distance(prefixSum.begin(), it);
 		for (int i = 0; i < size; i++) {
 			if (temp <= prefixSum[i]) return i;
 		}
